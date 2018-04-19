@@ -1,0 +1,266 @@
+////
+NO CAMBIAR!!
+Codificación, idioma, tabla de contenidos, tipo de documento
+////
+:encoding: utf-8
+:lang: es
+:toc: right
+:toc-title: Tabla de contenidos
+:doctype: book
+:imagesdir: ./images
+
+
+
+
+////
+Nombre y título del trabajo
+////
+# Consumo de una API en una aplicación Ionic
+Desarrollo de Aplicaciones Híbridas
+Máster TAII - UAL
+
+// NO CAMBIAR!! (Entrar en modo no numerado de apartados)
+:numbered!: 
+
+
+[abstract]
+## Resumen
+
+Veremos cómo crear una app sencilla que consuma datos JSON de una API que muestre informacion general en un listado y detalles en una página aparte.
+
+.Objetivos
+
+* Creación de un servicio
+* Consumo del servicio
+* Acceso a detalles
+
+// Entrar en modo numerado de apartados
+:numbered:
+
+## Introducción 
+
+Comenzaremos creando una app que consuma datos de una lista de noticias y ofrezca información detallada al seleccionar una noticia. La lista de noticias consume de una API que publica sus datos en JSON.
+
+[source]
+----
+$ ionic start apiNoticias
+$ cd apiNoticias
+$ ionic serve
+----
+
+## Creación de un servicio
+
+[source]
+----
+ionic generate provider noticias <1>
+ionig generate page noticia <2>
+----
+<1> Componente proveedor de noticias
+<2> Página de detalle de una noticia
+
+.El archivo `src/providers/noticias/noticias.ts`
+====
+[source]
+----
+import { HttpClient } from '@angular/common/http'; <1>
+import { Injectable } from '@angular/core';
+
+const baseURL = "https://news.ual.es/wp-json/wp/v2/"; <2> 
+
+@Injectable()
+export class NoticiasProvider {
+
+  constructor(public http: HttpClient) { <3>
+  }
+
+  getNoticias() { <4>
+    let url = baseURL + "posts/"
+    return this.http.get(url); <5>
+  }
+
+  getNoticia (id:any) {
+    let url = baseURL + "posts/" + id + "?_embed";
+    return this.http.get(url);
+  }
+
+  getMedia  (id:any) {
+    let url = baseURL + "media/" + id;
+    return this.http.get(url);
+  }
+
+}
+----
+<1> Clases necesarias y creadas por el CLI al crear el servicio
+<2> URL base de la API para ayudar a componer el resto de endpoints
+<3> El CLI inyecta `HttpClient` para poder consumir datos de la API
+<4> Métodos de acceso a la API
+<5> El método `get()` de `HttpClient` recupera los datos de un endpoint
+====
+
+### Modificación del archivo `app.module.ts`
+
+El CLI añade las clases de los providers creados a `app.module.ts`. Sin embargo, no los añade al array `imports`. También haremos las modificaciones para incorporar la página de detalles
+Aquí se muestra el resultado final.
+
+[source]
+----
+import { NoticiaPage } from './../pages/noticia/noticia'; <1>
+import { NoticiasProvider } from '../providers/noticias/noticias'; <2>
+import { HttpClientModule } from '@angular/common/http'; <3>
+
+@NgModule({
+  declarations: [
+    MyApp,
+    HomePage, 
+    NoticiaPage <4>
+  ],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(MyApp),
+    HttpClientModule <5>
+  ],
+  bootstrap: [IonicApp],
+  entryComponents: [
+    MyApp,
+    HomePage, <
+    NoticiaPage <6>
+  ],
+  providers: [
+    StatusBar,
+    SplashScreen,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    NoticiasProvider <7>
+  ]
+})
+export class AppModule {}
+----
+<1> Clase de la página de detalle de la noticia
+<2> Clase del servicio de noticias
+<3> Clase necesaria para uso de APIs
+<4> Clase de la página de detalle
+<5> Añadir `HttpClientModule` al array `imports`
+<6> La clase del detalle también tiene que estar en `entryComponents`
+<7> Añadir el provider de noticias a la lista de `providers`
+
+## Mostrar una lista de resultados de una API
+
+.El archivo `src/pages/home/home.ts`
+====
+[source]
+----
+import { NoticiaPage } from './../noticia/noticia';
+import { NoticiasProvider } from './../../providers/noticias/noticias';
+import { Component } from '@angular/core';
+import { NavController } from 'ionic-angular';
+import { not } from '@angular/compiler/src/output/output_ast';
+
+@Component({
+  selector: 'page-home',
+  templateUrl: 'home.html'
+})
+export class HomePage {
+  noticias = [];
+  noticia = [];
+  media = [];
+
+  constructor(public navCtrl: NavController, private noticiasProvider: NoticiasProvider) {
+    noticiasProvider.getNoticias().subscribe((result: any) => {
+      this.noticias = result;
+      console.log(result);
+    })
+  }
+
+  getNoticia(id: any) {
+    this.noticiasProvider.getNoticia(id).subscribe((result: any) => {
+      this.noticia = result;
+      this.navCtrl.push(NoticiaPage, {"noticia": this.noticia, "media": this.media});
+    });
+
+  }
+
+}
+----
+====
+
+### Presentación de los resultados de la lista
+
+.El archivo `src/pages/home/home.html`
+====
+[source]
+----
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      UAL News
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let noticia of noticias" (click)="getNoticia(noticia.id)">
+      <h2>{{ noticia.title.rendered }}</h2>
+      <p>{{ noticia.date }}</p>
+    </ion-item>
+  </ion-list>
+
+</ion-content>
+----
+====
+
+## Acceso a los detalles de una noticia
+
+.El archivo `src/pages/noticia/noticia.ts`
+====
+[source]
+----
+import { Component } from '@angular/core';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
+
+@IonicPage()
+@Component({
+  selector: 'page-noticia',
+  templateUrl: 'noticia.html',
+})
+export class NoticiaPage {
+  noticia: any;
+  media: any;
+
+  constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.noticia = this.navParams.get("noticia");
+    this.media = this.navParams.get("media");
+
+    console.log("Media" + this.media)
+  }
+
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad NoticiaPage');
+  }
+
+}
+----
+====
+
+### Presentación de los detalles de una noticia
+
+.El arvhivo `src/pages/noticia/noticia.html`
+====
+----
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Noticias</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+    <h1>{{ noticia.title.rendered }}</h1>
+    <p>Publicado el {{ noticia.date }} </p>
+    <p [innerHTML]="noticia.content.rendered"></p>
+    <a href ="{{noticia.link}}">Ir al artículo original</a>
+</ion-content>
+----
+====
+
