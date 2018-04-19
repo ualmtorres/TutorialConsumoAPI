@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.5.dev">
 <meta name="author" content="Desarrollo de Aplicaciones Híbridas">
-<title>Ionic Components</title>
+<title>Consumo de una API en una aplicación Ionic</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -421,24 +421,29 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="book toc2 toc-right">
 <div id="header">
-<h1>Ionic Components</h1>
+<h1>Consumo de una API en una aplicación Ionic</h1>
 <div class="details">
 <span id="author" class="author">Desarrollo de Aplicaciones Híbridas</span><br>
-<span id="revdate">Msáter TAII - UAL</span>
+<span id="revdate">Máster TAII - UAL</span>
 </div>
 <div id="toc" class="toc2">
 <div id="toctitle">Tabla de contenidos</div>
 <ul class="sectlevel1">
 <li><a href="#trueresumen">Resumen</a></li>
-<li><a href="#trueintroducci-n">1. Introducción</a>
+<li><a href="#trueintroducci-n">1. Introducción</a></li>
+<li><a href="#truecreaci-n-de-un-servicio">2. Creación de un servicio</a>
 <ul class="sectlevel2">
-<li><a href="#truecrear-una-p-gina">1.1. Crear una página</a></li>
-<li><a href="#truecrear-una-p-gina-anidada">1.2. Crear una página anidada</a></li>
-<li><a href="#truea-adir-tarjetas">1.3. Añadir tarjetas</a></li>
-<li><a href="#trueiterando-sobre-un-conjunto-de-resultados">1.4. Iterando sobre un conjunto de resultados</a></li>
-<li><a href="#trueeliminaci-n-de-las-p-ginas-innecesarias">1.5. Eliminación de las páginas innecesarias</a></li>
-<li><a href="#truemodificaci-n-de-la-barra-p-ginas">1.6. Modificación de la barra páginas</a></li>
-<li><a href="#truemodificaci-n-de-la-p-gina-de-contacto">1.7. Modificación de la página de contacto</a></li>
+<li><a href="#truemodificaci-n-del-archivo-code-app-module-ts-code">2.1. Modificación del archivo <code>app.module.ts</code></a></li>
+</ul>
+</li>
+<li><a href="#truemostrar-una-lista-de-resultados-de-una-api">3. Mostrar una lista de resultados de una API</a>
+<ul class="sectlevel2">
+<li><a href="#truepresentaci-n-de-los-resultados-de-la-lista">3.1. Presentación de los resultados de la lista</a></li>
+</ul>
+</li>
+<li><a href="#trueacceso-a-los-detalles-de-una-noticia">4. Acceso a los detalles de una noticia</a>
+<ul class="sectlevel2">
+<li><a href="#truepresentaci-n-de-los-detalles-de-una-noticia">4.1. Presentación de los detalles de una noticia</a></li>
 </ul>
 </li>
 </ul>
@@ -449,16 +454,19 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="trueresumen"><a class="anchor" href="#trueresumen"></a>Resumen</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Veremos los componentes básicos para el desarrollo de una app Ionic.</p>
+<p>Veremos cómo crear una app sencilla que consuma datos JSON de una API que muestre informacion general en un listado y detalles en una página aparte.</p>
 </div>
 <div class="ulist">
 <div class="title">Objetivos</div>
 <ul>
 <li>
-<p>Conocer los componentes básicos de Ionic</p>
+<p>Creación de un servicio</p>
 </li>
 <li>
-<p>Aprender a usar la navegación entre páginas</p>
+<p>Consumo del servicio</p>
+</li>
+<li>
+<p>Acceso a detalles</p>
 </li>
 </ul>
 </div>
@@ -468,615 +476,307 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="trueintroducci-n"><a class="anchor" href="#trueintroducci-n"></a>1. Introducción</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Comenzaremos creando una app basada en pestañas. Inicialmente no integraremos la app con Cordova y no le incluiremos el Ionic Pro SDK.</p>
+<p>Comenzaremos creando una app que consuma datos de una lista de noticias y ofrezca información detallada al seleccionar una noticia. La lista de noticias consume de una API que publica sus datos en JSON.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>$ ionic start ionicComponents tabs
-$ cd ionicComponents
+<pre class="highlightjs highlight"><code>$ ionic start apiNoticias
+$ cd apiNoticias
 $ ionic serve</code></pre>
 </div>
 </div>
-<div class="sect2">
-<h3 id="truecrear-una-p-gina"><a class="anchor" href="#truecrear-una-p-gina"></a>1.1. Crear una página</h3>
-<div class="paragraph">
-<p>Crearemos una nueva página del tipo ficha denominada Estudios de esta forma</p>
 </div>
+</div>
+<div class="sect1">
+<h2 id="truecreaci-n-de-un-servicio"><a class="anchor" href="#truecreaci-n-de-un-servicio"></a>2. Creación de un servicio</h2>
+<div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>$ ionic generate tabs
-
-? What should the name be? Estudios
-
-? How many tabs? 1
-
-? Name of this tab: Estudios
-[OK] Generated a tabs page named Estudios!</code></pre>
+<pre class="highlightjs highlight"><code>ionic generate provider noticias <i class="conum" data-value="1"></i><b>(1)</b>
+ionig generate page noticia <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>A continuación tenemos que añadir la página a <code>app.module.ts</code>. Hay que importarla y añadirla a los arrays <code>declarations</code> y <code>entryComponents</code></p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>...
-import { EstudiosPage } from '../pages/estudios/estudios';
-...
-@NgModule({
-  declarations: [
-    ...
-    EstudiosPage
-  ],
-  ...
-  entryComponents: [
-    ...,
-    EstudiosPage
-  ],
-  ...
-})
-export class AppModule {}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>A continuación, hay que actualizar el componente <code>src/pages/tabs/tabs.ts</code> importando la página e incluyéndola en la clase <code>TabsPage</code>.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>...
-import { EstudiosPage } from '../estudios/estudios';
-...
-export class TabsPage {
-
-  ...
-  tab4Root = EstudiosPage;
-  ...
-
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Por último, ya sólo hay que incluir una nueva pestaña en <code>src/pages/tabs/tabs.ts</code> con la ficha Estudios. El <a href="https://ionicframework.com/docs/ionicons/">conjunto de iconos disponibles de Ionic</a> proporcionará el icono adecuado.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>&lt;ion-tabs&gt;
-  &lt;ion-tab [root]="tab1Root" tabTitle="Home" tabIcon="home"&gt;&lt;/ion-tab&gt;
-  &lt;ion-tab [root]="tab2Root" tabTitle="About" tabIcon="information-circle"&gt;&lt;/ion-tab&gt;
-  &lt;ion-tab [root]="tab3Root" tabTitle="Contact" tabIcon="contacts"&gt;&lt;/ion-tab&gt;
-  &lt;ion-tab [root]="tab4Root" tabTitle="Estudios" tabIcon="book"&gt;&lt;/ion-tab&gt;
-&lt;/ion-tabs&gt;</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="truecrear-una-p-gina-anidada"><a class="anchor" href="#truecrear-una-p-gina-anidada"></a>1.2. Crear una página anidada</h3>
-<div class="paragraph">
-<p>Desde la página Estudios daremos la opción de ir a estudios de Grado, Máster y Doctorado. Esto lo haremos creando tres botones que abrirán sus respectivas páginas.</p>
-</div>
-<div class="paragraph">
-<p>Comenzamos creando las páginas</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>$ ionic generate page grados
-$ ionic generate page masters
-$ ionic generate page doctorado</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Esto creará tres directorios <code>grados</code>, <code>masters</code> y <code>doctorado</code> en <code>src/app/pages</code>. Cada directorio contrendrá su controlador, su vista y su hoja de estilos.</p>
-</div>
-<div class="paragraph">
-<p>A continuación, tenemos que modificar <code>src/app/app.module.ts</code> para incluir las páginas creadas.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>...
-import { GradosPage } from '../pages/grados/grados';
-import { MastersPage } from '../pages/masters/masters';
-import { DoctoradoPage } from '../pages/doctorado/doctorado';
-...
-@NgModule({
-  declarations: [
-    ...
-    GradosPage,
-    MastersPage,
-    DoctoradoPage
-  ],
-  ...
-  entryComponents: [
-    ...
-    GradosPage,
-    MastersPage,
-    DoctoradoPage
-  ],
-  ...
-})
-export class AppModule {}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>En la vista de Estudios <code>src/app/pages/estudios/estudios.html</code> tenemos que añadir tres métodos para abrir el formulario correspondiente a estudios de grado, máster o doctorado. Para ellos usaremos la instancia de <code>NavController</code> disponible en el constructor pasándole la página que queremos abrir al método <code>push</code>.</p>
-</div>
-<div class="paragraph">
-<p>Como siempre, tendremos que importar los componentes que queramos usar.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>...
-import { GradosPage } from '../grados/grados';
-import { MastersPage } from '../masters/masters';
-import { DoctoradoPage } from '../doctorado/doctorado';
-...
-export class EstudiosPage {
-  ...
-  openGrades() {
-    this.navCtrl.push(GradosPage);
-  }
-
-  openMasters() {
-    this.navCtrl.push(MastersPage);
-  }
-
-  openPhD() {
-    this.navCtrl.push(DoctoradoPage);
-  }
-  ...
-}</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Por último, en la vista de Estudios (<code>src/app/pages/estudios/estudios.html</code>) tenemos que crear un enlace para abrir cada página. En nuestro caso lo haremos creando tres tags <code>&lt;img&gt;</code> HTML, uno para cada opción, anádiéndoles el evento <code>(click)</code> configurado al método <code>openGrades()</code>, <code>openMasters()</code> u <code>openPhD()</code> según proceda.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>&lt;ion-header&gt;
-  &lt;ion-navbar&gt;
-    &lt;ion-title&gt;Estudios&lt;/ion-title&gt;
-  &lt;/ion-navbar&gt;
-&lt;/ion-header&gt;
-
-&lt;ion-content&gt;
-  &lt;img src = "../../assets/imgs/Grados.png" (click)="openGrades()" &gt;
-  &lt;img src = "../../assets/imgs/Masters.png" (click)="openMasters()" &gt;
-  &lt;img src = "../../assets/imgs/Doctorado.png" (click)="openPhD()" &gt;
-&lt;/ion-content&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Las imaǵenes las colocaremos en la carpeta <code>src/app/assets/img</code>. Las usadas en este tutorial han sido capturadas directamente de la web de la UAL y recortadas posteriormente.</p>
-</div>
-<div class="admonitionblock tip">
+<div class="colist arabic">
 <table>
 <tr>
-<td class="icon">
-<i class="fa icon-tip" title="Tip"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>Al convertir las imágenes en elementos <em>clickables</em> si vemos la aplicación en un navegador no veremos que el puntero del ratón cambie a una mano cuando esté sobre las imágenes. Esto se soluciona añadiendo el estilo siguiente al archivo de estilos de la página de Estudios (<code>src/app/pages/estudios/estudios.scss</code>).</p>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Componente proveedor de noticias</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Página de detalle de una noticia</td>
+</tr>
+</table>
 </div>
+<div class="exampleblock">
+<div class="title">Example 1. El archivo <code>src/providers/noticias/noticias.ts</code></div>
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>img {
-    cursor: pointer;
+<pre class="highlightjs highlight"><code>import { HttpClient } from '@angular/common/http'; <i class="conum" data-value="1"></i><b>(1)</b>
+import { Injectable } from '@angular/core';
+
+const baseURL = "https://news.ual.es/wp-json/wp/v2/"; <i class="conum" data-value="2"></i><b>(2)</b>
+
+@Injectable()
+export class NoticiasProvider {
+
+  constructor(public http: HttpClient) { <i class="conum" data-value="3"></i><b>(3)</b>
+  }
+
+  getNoticias() { <i class="conum" data-value="4"></i><b>(4)</b>
+    let url = baseURL + "posts/"
+    return this.http.get(url); <i class="conum" data-value="5"></i><b>(5)</b>
+  }
+
+  getNoticia (id:any) {
+    let url = baseURL + "posts/" + id + "?_embed";
+    return this.http.get(url);
+  }
+
+  getMedia  (id:any) {
+    let url = baseURL + "media/" + id;
+    return this.http.get(url);
+  }
+
 }</code></pre>
 </div>
 </div>
-</td>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Clases necesarias y creadas por el CLI al crear el servicio</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>URL base de la API para ayudar a componer el resto de endpoints</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>El CLI inyecta <code>HttpClient</code> para poder consumir datos de la API</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Métodos de acceso a la API</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>El método <code>get()</code> de <code>HttpClient</code> recupera los datos de un endpoint</td>
 </tr>
 </table>
 </div>
 </div>
+</div>
 <div class="sect2">
-<h3 id="truea-adir-tarjetas"><a class="anchor" href="#truea-adir-tarjetas"></a>1.3. Añadir tarjetas</h3>
+<h3 id="truemodificaci-n-del-archivo-code-app-module-ts-code"><a class="anchor" href="#truemodificaci-n-del-archivo-code-app-module-ts-code"></a>2.1. Modificación del archivo <code>app.module.ts</code></h3>
 <div class="paragraph">
-<p>Las <a href="https://ionicframework.com/docs/components/#cards">tarjetas</a> son una forma de destacar texto en una página.</p>
-</div>
-<div class="paragraph">
-<p>Las tarjetas pueden contener cabercera y contenido. En nuestra aplicación añadiremos a la vista de estudios (<code>src/app/pages/estudios/estudios.html</code>) crearemos una tarjeta con un enlace para mostrar más información sobre los estudios de la UAL en la web oficial.</p>
+<p>El CLI añade las clases de los providers creados a <code>app.module.ts</code>. Sin embargo, no los añade al array <code>imports</code>. También haremos las modificaciones para incorporar la página de detalles
+Aquí se muestra el resultado final.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>  &lt;ion-card&gt;
-    &lt;ion-card-header&gt;
-      Información complementaria
-    &lt;/ion-card-header&gt;
-    &lt;ion-card-content&gt;
-      Consulta la &lt;a href = "https://www.ual.es/estudios"&gt;web de estudios en la UAL&lt;/a&gt;
-    &lt;/ion-card-content&gt;
-  &lt;/ion-card&gt;</code></pre>
+<pre class="highlightjs highlight"><code>import { NoticiaPage } from './../pages/noticia/noticia'; <i class="conum" data-value="1"></i><b>(1)</b>
+import { NoticiasProvider } from '../providers/noticias/noticias'; <i class="conum" data-value="2"></i><b>(2)</b>
+import { HttpClientModule } from '@angular/common/http'; <i class="conum" data-value="3"></i><b>(3)</b>
+
+@NgModule({
+  declarations: [
+    MyApp,
+    HomePage,
+    NoticiaPage <i class="conum" data-value="4"></i><b>(4)</b>
+  ],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot(MyApp),
+    HttpClientModule <i class="conum" data-value="5"></i><b>(5)</b>
+  ],
+  bootstrap: [IonicApp],
+  entryComponents: [
+    MyApp,
+    HomePage, &lt;
+    NoticiaPage <i class="conum" data-value="6"></i><b>(6)</b>
+  ],
+  providers: [
+    StatusBar,
+    SplashScreen,
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    NoticiasProvider <i class="conum" data-value="7"></i><b>(7)</b>
+  ]
+})
+export class AppModule {}</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Podemos mejorar nuestra app convirtiendo en tarjetas las imágenes que nos dan acceso a los grados, másters y doctorado creadas anteriormente y enriqueciéndolas con algunos estilos.</p>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Clase de la página de detalle de la noticia</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Clase del servicio de noticias</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Clase necesaria para uso de APIs</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Clase de la página de detalle</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Añadir <code>HttpClientModule</code> al array <code>imports</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>La clase del detalle también tiene que estar en <code>entryComponents</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>Añadir el provider de noticias a la lista de <code>providers</code></td>
+</tr>
+</table>
 </div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="truemostrar-una-lista-de-resultados-de-una-api"><a class="anchor" href="#truemostrar-una-lista-de-resultados-de-una-api"></a>3. Mostrar una lista de resultados de una API</h2>
+<div class="sectionbody">
 <div class="exampleblock">
-<div class="title">Example 1. El archivo <code>src/app/pages/estudios/estudios.html</code></div>
+<div class="title">Example 2. El archivo <code>src/pages/home/home.ts</code></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>&lt;ion-header&gt;
-  &lt;ion-navbar&gt;
-    &lt;ion-title&gt;Estudios&lt;/ion-title&gt;
-  &lt;/ion-navbar&gt;
-&lt;/ion-header&gt;
+<pre class="highlightjs highlight"><code>import { NoticiaPage } from './../noticia/noticia';
+import { NoticiasProvider } from './../../providers/noticias/noticias';
+import { Component } from '@angular/core';
+import { NavController } from 'ionic-angular';
+import { not } from '@angular/compiler/src/output/output_ast';
 
+@Component({
+  selector: 'page-home',
+  templateUrl: 'home.html'
+})
+export class HomePage {
+  noticias = [];
+  noticia = [];
+  media = [];
 
-&lt;ion-content class="card-background-page"&gt;
-  &lt;ion-card&gt;
-    &lt;img src = "../../assets/imgs/Grados.png" (click)="openGrades()" &gt;
-    &lt;div class="card-title"&gt;Grados&lt;/div&gt;
-  &lt;/ion-card&gt;
-  &lt;ion-card&gt;
-    &lt;img src = "../../assets/imgs/Masters.png" (click)="openMasters()" &gt;
-    &lt;div class="card-title"&gt;Másters&lt;/div&gt;
-  &lt;/ion-card&gt;
-  &lt;ion-card&gt;
-    &lt;img src = "../../assets/imgs/Doctorado.png" (click)="openPhD()" &gt;
-    &lt;div class="card-title"&gt;Doctorado&lt;/div&gt;
+  constructor(public navCtrl: NavController, private noticiasProvider: NoticiasProvider) {
+    noticiasProvider.getNoticias().subscribe((result: any) =&gt; {
+      this.noticias = result;
+      console.log(result);
+    })
+  }
 
-  &lt;/ion-card&gt;
+  getNoticia(id: any) {
+    this.noticiasProvider.getNoticia(id).subscribe((result: any) =&gt; {
+      this.noticia = result;
+      this.navCtrl.push(NoticiaPage, {"noticia": this.noticia, "media": this.media});
+    });
 
-  &lt;ion-card&gt;
-    &lt;ion-card-header&gt;
-      Información complementaria
-    &lt;/ion-card-header&gt;
-    &lt;ion-card-content&gt;
-      Consulta la &lt;a href = "https://www.ual.es/estudios"&gt;web de estudios en la UAL&lt;/a&gt;
-    &lt;/ion-card-content&gt;
-  &lt;/ion-card&gt;
-&lt;/ion-content&gt;</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="paragraph">
-<p>Los estilos a aplicar serían estos</p>
-</div>
-<div class="exampleblock">
-<div class="title">Example 2. El archivo  <code>src/app/pages/estudios/estudios.scss</code></div>
-<div class="content">
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>page-estudios {
+  }
 
-}
-
-
-.card-background-page {
-
-    ion-card {
-        position: relative;
-        text-align: right;
-    }
-
-    .card-title {
-        position: absolute;
-        top: 36%;
-        font-size: 2.0em;
-        width: 100%;
-        font-weight: bold;
-        color: #fff;
-    }
 }</code></pre>
 </div>
 </div>
 </div>
 </div>
-</div>
 <div class="sect2">
-<h3 id="trueiterando-sobre-un-conjunto-de-resultados"><a class="anchor" href="#trueiterando-sobre-un-conjunto-de-resultados"></a>1.4. Iterando sobre un conjunto de resultados</h3>
-<div class="paragraph">
-<p>Tanto los grados, como los masters y doctorado mostrarán una lista de valores. Inicialmente, esos valores los tendremos almacenados en un JSON en el controlador de cada componente. Posteriormente veremos cómo crear un servicio que recupere los datos de una base de datos.</p>
-</div>
-<div class="paragraph">
-<p>Mostraremos los datos usando <a href="https://ionicframework.com/docs/components/#lists">listas</a> iterando sobre ellas con la directiva <code>*ngFor</code>. En nuestro caso usaremos dos bucles anidados. El externo iterará sobre las ramas y el interno sobre los estudios de cada rama.</p>
-</div>
-<div class="paragraph">
-<p>En la vista <code>src/app/pages/grados/grados.scss</code> cambiaremos el contenido de la página por el siguiente. En la iteración externa nos quedamos con la rama. Sobre cada rama iteraremos sobre los distintos grados de la rama.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>&lt;ion-content&gt;
-  &lt;ion-item-group&gt;
-    &lt;ion-list *ngFor="let rama of estudios"&gt;
-      &lt;ion-item-divider&gt;{{rama.rama}}&lt;/ion-item-divider&gt;
-      &lt;ion-item *ngFor="let gradoRama of rama.estudios" (click)="openURL(gradoRama.url)"&gt;
-        &lt;h2&gt;{{gradoRama.estudios}}&lt;/h2&gt;
-        &lt;p&gt;{{gradoRama.plan}}&lt;/p&gt;
-      &lt;/ion-item&gt;
-    &lt;/ion-list&gt;
-  &lt;/ion-item-group&gt;
-&lt;/ion-content&gt;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Al pulsar sobre unos estudios abriremos la URL de la web oficial. Para ello definiremos un método <code>openURL()</code> en el controlador. Este sería el código del método</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlightjs highlight"><code>  openURL(url: string) {
-    window.open(url, '_self');
-  }</code></pre>
-</div>
-</div>
-</div>
-<div class="sect2">
-<h3 id="trueeliminaci-n-de-las-p-ginas-innecesarias"><a class="anchor" href="#trueeliminaci-n-de-las-p-ginas-innecesarias"></a>1.5. Eliminación de las páginas innecesarias</h3>
-<div class="paragraph">
-<p>Al crear el proyecto se crearon una serie de páginas que ahora resultan innecesarias. Vamos a eliminar la página <code>About</code>.</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Modificar el archivo <code>src/app/app.module.ts</code></p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Eliminar la importación de <code>AboutPage</code>.</p>
-</li>
-<li>
-<p>Eliminar <code>AboutPage</code> de los arrays <code>declarations</code> y <code>entryComponents</code>.</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Modificar el archivo <code>src/app/pages/tabs/tabs.ts</code></p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Eliminar la importación de <code>AboutPage</code>.</p>
-</li>
-<li>
-<p>Eliminar en la clase el <code>tabRoot</code> de <code>AboutPage</code>.</p>
-</li>
-</ol>
-</div>
-</li>
-<li>
-<p>Modificar el archivo <code>src/app/pages/tabs/tabs.html</code>.</p>
-<div class="olist loweralpha">
-<ol class="loweralpha" type="a">
-<li>
-<p>Eliminar el <code>ion-tab</code> de <code>About</code>.</p>
-</li>
-</ol>
-</div>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="truemodificaci-n-de-la-barra-p-ginas"><a class="anchor" href="#truemodificaci-n-de-la-barra-p-ginas"></a>1.6. Modificación de la barra páginas</h3>
-<div class="paragraph">
-<p>Queremos cambiar el orden en que aparecen las páginas en la barra inferior y el icono de Contacto. Ahora Contacto será la última.</p>
-</div>
-<div class="paragraph">
-<p>En el archivo <code>src/app/pages/tabs/tabs.ts</code>:</p>
-</div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Modificar el atributo <code>tabTitle</code> al valor <code>Contacto</code></p>
-</li>
-<li>
-<p>Modificar el atributo <code>tabIcon</code> al valor <code>information-circle</code></p>
-</li>
-</ol>
-</div>
-</div>
-<div class="sect2">
-<h3 id="truemodificaci-n-de-la-p-gina-de-contacto"><a class="anchor" href="#truemodificaci-n-de-la-p-gina-de-contacto"></a>1.7. Modificación de la página de contacto</h3>
+<h3 id="truepresentaci-n-de-los-resultados-de-la-lista"><a class="anchor" href="#truepresentaci-n-de-los-resultados-de-la-lista"></a>3.1. Presentación de los resultados de la lista</h3>
 <div class="exampleblock">
-<div class="title">Example 3. El archivo <code>src/app/pages/contact/contact.html</code></div>
+<div class="title">Example 3. El archivo <code>src/pages/home/home.html</code></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code>&lt;ion-header&gt;
   &lt;ion-navbar&gt;
     &lt;ion-title&gt;
-      Contacto
+      UAL News
     &lt;/ion-title&gt;
   &lt;/ion-navbar&gt;
 &lt;/ion-header&gt;
 
 &lt;ion-content&gt;
-  &lt;img src = "../../assets/imgs/UAL.png"&gt; <i class="conum" data-value="1"></i><b>(1)</b>
-
-  &lt;ion-list&gt; <i class="conum" data-value="2"></i><b>(2)</b>
-    &lt;ion-item (click)="openURL('https://www.google.com/maps/dir/?api=1&amp;destination=Universidad%20de%20Almer%C3%ADa')"&gt; <i class="conum" data-value="3"></i><b>(3)</b>
-      &lt;ion-icon name = "pin" item-start&gt;&lt;/ion-icon&gt; <i class="conum" data-value="4"></i><b>(4)</b>
-      &lt;p&gt;Carretera Sacramento s/n&lt;/p&gt; <i class="conum" data-value="5"></i><b>(5)</b>
-      &lt;p&gt;04120 La Cañada de San Urbano&lt;/p&gt;
-      &lt;p&gt;Almería&lt;/p&gt;
-    &lt;/ion-item&gt;
-
-    &lt;ion-item (click)="openURL('https://cms.ual.es/UAL/contacto/index.htm')"&gt;
-      &lt;ion-icon name = "mail" item-start&gt;&lt;/ion-icon&gt;
-      &lt;p&gt;Contacta con nostros&lt;/p&gt;
+  &lt;ion-list&gt;
+    &lt;ion-item *ngFor="let noticia of noticias" (click)="getNoticia(noticia.id)"&gt;
+      &lt;h2&gt;{{ noticia.title.rendered }}&lt;/h2&gt;
+      &lt;p&gt;{{ noticia.date }}&lt;/p&gt;
     &lt;/ion-item&gt;
   &lt;/ion-list&gt;
 
-  &lt;ion-item-group&gt; <i class="conum" data-value="6"></i><b>(6)</b>
-    &lt;ion-item-divider color="light"&gt;Teléfonos de interés&lt;/ion-item-divider&gt; <i class="conum" data-value="7"></i><b>(7)</b>
-    &lt;ion-item (click)="call('950214000')"&gt; <i class="conum" data-value="8"></i><b>(8)</b>
-      &lt;h2&gt;Información general para estudiantes (Secretaría)&lt;/h2&gt; <i class="conum" data-value="9"></i><b>(9)</b>
-      &lt;p&gt;+34 950 21 40 00&lt;/p&gt;
-      &lt;ion-icon name = "call" item-end&gt;&lt;/ion-icon&gt; <i class="conum" data-value="10"></i><b>(10)</b>
-    &lt;/ion-item&gt;
-    &lt;ion-item (click)="call('950214999')"&gt;
-      &lt;h2&gt;Cita previa&lt;/h2&gt;
-      &lt;p&gt;+34 950 21 49 99&lt;/p&gt;
-      &lt;ion-icon name = "call" item-end&gt;&lt;/ion-icon&gt;
-    &lt;/ion-item&gt;
-    &lt;ion-item (click)="call('950015550')"&gt;
-      &lt;h2&gt;Conserjería del Edificio Central&lt;/h2&gt;
-      &lt;p&gt;+34 950 01 55 50&lt;/p&gt;
-      &lt;ion-icon name = "call" item-end&gt;&lt;/ion-icon&gt;
-    &lt;/ion-item&gt;
-
-    &lt;ion-item-divider color="light"&gt;Centro de atención al usuario&lt;/ion-item-divider&gt;
-
-    &lt;ion-item (click)="openURL('https://otrspas.ual.es/otrs/customer.pl')"&gt; <i class="conum" data-value="11"></i><b>(11)</b>
-      &lt;ion-icon name = "link" item-end&gt;&lt;/ion-icon&gt;
-      &lt;p&gt;CAU de Administración y Servicios&lt;/p&gt;
-    &lt;/ion-item&gt;
-    &lt;ion-item (click)="openURL('https://otrs5.ual.es/otrs/customer.pl')"&gt;
-      &lt;ion-icon name = "link" item-end&gt;&lt;/ion-icon&gt;
-      &lt;p&gt;CAU de Servicios TIC&lt;/p&gt;
-    &lt;/ion-item&gt;
-
-  &lt;/ion-item-group&gt;
 &lt;/ion-content&gt;</code></pre>
 </div>
 </div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Imagen institucional</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Primer bloque de opciones de la pantalla</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Los elementos son enlaces a páginas externas. Pasamos al método <code>openURL()</code> del controlador la URL a abrir.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Creación de un icono colocado en la parte izquierda de la pantalla con <code>item-start</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
-<td>Texto del elemento</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Segundo bloque de opciones de la pantalla</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="7"></i><b>7</b></td>
-<td>Separador</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="8"></i><b>8</b></td>
-<td>Creación del elemento y asignación del controlador de evento para llamada de teléfono. Pasaremos el número de teléfono al método <code>call()</code> de nuestro controlador.</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="9"></i><b>9</b></td>
-<td>Texto del elemento</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="10"></i><b>10</b></td>
-<td>Creación de un icono colocado en la parte derecha de la pantalla con <code>item-end</code></td>
-</tr>
-<tr>
-<td><i class="conum" data-value="11"></i><b>11</b></td>
-<td>Los elementos de la segunda lista son enlaces a páginas externas. Pasamos al método <code>openURL()</code> del controlador la URL a abrir.</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="trueacceso-a-los-detalles-de-una-noticia"><a class="anchor" href="#trueacceso-a-los-detalles-de-una-noticia"></a>4. Acceso a los detalles de una noticia</h2>
+<div class="sectionbody">
 <div class="exampleblock">
-<div class="title">Example 4. El archivo <code>src/pages/contact/contact.ts</code></div>
+<div class="title">Example 4. El archivo <code>src/pages/noticia/noticia.ts</code></div>
 <div class="content">
 <div class="listingblock">
 <div class="content">
 <pre class="highlightjs highlight"><code>import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
-import { CallNumber } from '@ionic-native/call-number'; <i class="conum" data-value="1"></i><b>(1)</b>
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
+@IonicPage()
 @Component({
-  selector: 'page-contact',
-  templateUrl: 'contact.html'
+  selector: 'page-noticia',
+  templateUrl: 'noticia.html',
 })
-export class ContactPage {
+export class NoticiaPage {
+  noticia: any;
+  media: any;
 
-  constructor(public navCtrl: NavController, private callNumber: CallNumber) { }<i class="conum" data-value="2"></i><b>(2)</b>
+  constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.noticia = this.navParams.get("noticia");
+    this.media = this.navParams.get("media");
 
-  openURL(url: string) { <i class="conum" data-value="3"></i><b>(3)</b>
-    window.open(url, '__blank');
+    console.log("Media" + this.media)
   }
 
-  call(phoneNumber: string) { <i class="conum" data-value="4"></i><b>(4)</b>
-    this.callNumber.callNumber(phoneNumber, true)
-  .then(res =&gt; console.log('Launched dialer!', res))
-  .catch(err =&gt; console.log('Error launching dialer', err));
-
+  ionViewDidLoad() {
+    console.log('ionViewDidLoad NoticiaPage');
   }
+
 }</code></pre>
 </div>
 </div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Importación del componente <code>CallNumber</code> de Ionic Native</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Inyectar el componente <code>CallNumber</code> para poder hacer uso de él</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Método para abrir en un navegador aparte enlaces a páginas externas</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="4"></i><b>4</b></td>
-<td>Método para efectuar una llamada de teléfono al número indicado</td>
-</tr>
-</table>
 </div>
 </div>
-</div>
-<div class="admonitionblock caution">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-caution" title="Caution"></i>
-</td>
-<td class="content">
-<div class="paragraph">
-<p>No olvidar modificar el archivo <code>app.module.ts</code> para cargar el componente <code>CallNumber</code></p>
-</div>
+<div class="sect2">
+<h3 id="truepresentaci-n-de-los-detalles-de-una-noticia"><a class="anchor" href="#truepresentaci-n-de-los-detalles-de-una-noticia"></a>4.1. Presentación de los detalles de una noticia</h3>
+<div class="exampleblock">
+<div class="title">Example 5. El arvhivo <code>src/pages/noticia/noticia.html</code></div>
+<div class="content">
 <div class="listingblock">
 <div class="content">
-<pre class="highlightjs highlight"><code>...
-import { CallNumber } from '@ionic-native/call-number'; <i class="conum" data-value="1"></i><b>(1)</b>
-...
-@NgModule({
-  ...
-  providers: [
-    StatusBar,
-    SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
-    CallNumber <i class="conum" data-value="2"></i><b>(2)</b>
-  ]
-  ...
-})
-export class AppModule {}</code></pre>
+<pre>&lt;ion-header&gt;
+
+  &lt;ion-navbar&gt;
+    &lt;ion-title&gt;Noticias&lt;/ion-title&gt;
+  &lt;/ion-navbar&gt;
+
+&lt;/ion-header&gt;
+
+
+&lt;ion-content padding&gt;
+    &lt;h1&gt;{{ noticia.title.rendered }}&lt;/h1&gt;
+    &lt;p&gt;Publicado el {{ noticia.date }} &lt;/p&gt;
+    &lt;p [innerHTML]="noticia.content.rendered"&gt;&lt;/p&gt;
+    &lt;a href ="{{noticia.link}}"&gt;Ir al artículo original&lt;/a&gt;
+&lt;/ion-content&gt;</pre>
 </div>
 </div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Importación de la librería</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Incoporación del componente a los <em>providers</em></td>
-</tr>
-</table>
 </div>
-</td>
-</tr>
-</table>
 </div>
 </div>
 </div>
@@ -1084,7 +784,7 @@ export class AppModule {}</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-03-22 17:59:43 CET
+Last updated 2018-04-19 16:28:17 CEST
 </div>
 </div>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.9.1/styles/github.min.css">
